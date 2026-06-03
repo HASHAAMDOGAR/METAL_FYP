@@ -142,6 +142,51 @@ export default function HowItWorks() {
         ))}
       </div>
 
+      {/* Developer SDK */}
+      <Card className="mt-10 p-6">
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="text-xl font-semibold text-white">Native Developer SDK (Swift)</h2>
+          <Badge tone="accent">swift-sdk</Badge>
+          <Badge tone="green">new</Badge>
+        </div>
+        <p className="mt-2 text-slate-300">
+          A Swift package (<code className="code">MetalLLM</code>) so native macOS apps call models with one API and
+          choose <em>where</em> inference runs.
+        </p>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-xl border border-white/10 bg-ink-900/40 p-4">
+            <p className="font-medium text-white">☁️ .managedCloud</p>
+            <p className="mt-1 text-sm text-slate-400">
+              Routes to this backend → Modal GPU. Auto-acquires a free license, then calls{" "}
+              <code className="code">/v1/inference</code>.
+            </p>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-ink-900/40 p-4">
+            <p className="font-medium text-white">💻 .localInfer(ollamaModel:)</p>
+            <p className="mt-1 text-sm text-slate-400">
+              Downloads the model with <b>Ollama</b> and runs it <b>on-device</b> (Metal-accelerated) — no cloud,
+              fully private.
+            </p>
+          </div>
+        </div>
+        <CodeBlock>{`import MetalLLM
+
+let client = MetalLLM()
+try await client.login(username: "you@example.com", password: "•••••")
+
+// Cloud GPU (Modal)
+let cloud = client.model(id: modelId, mode: .managedCloud)
+let a = try await cloud.generate(prompt: "Hello!")     // path: cloud_modal
+
+// Local, on-device via Ollama (downloads on first use)
+let local = client.localModel(ollamaModel: "qwen2.5:0.5b")
+let b = try await local.generate(prompt: "Hello!")     // path: local_ollama`}</CodeBlock>
+        <p className="mt-3 text-xs text-slate-500">
+          Lives in the <code className="code">swift-sdk/</code> folder. Local mode needs Ollama running
+          (<code className="code">ollama serve</code>).
+        </p>
+      </Card>
+
       {/* Quickstart */}
       <Card className="mt-10 p-6">
         <h2 className="text-lg font-semibold text-white">Quickstart (cURL)</h2>
