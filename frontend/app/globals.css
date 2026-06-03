@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-ink-950 text-slate-200 antialiased;
+  background-image:
+    radial-gradient(60rem 60rem at 80% -10%, rgba(124, 108, 255, 0.18), transparent 60%),
+    radial-gradient(50rem 50rem at -10% 10%, rgba(56, 189, 248, 0.12), transparent 55%);
+  background-attachment: fixed;
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-6xl px-5;
+  }
+  .card {
+    @apply rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm;
+  }
+  .card-hover {
+    @apply transition hover:border-accent/40 hover:bg-white/[0.06];
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply btn bg-accent text-white shadow-lg shadow-accent/25 hover:bg-accent-glow;
+  }
+  .btn-ghost {
+    @apply btn border border-white/15 text-slate-200 hover:bg-white/5;
+  }
+  .badge {
+    @apply inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-xs font-medium text-slate-300;
+  }
+  .input {
+    @apply w-full rounded-xl border border-white/10 bg-ink-900/60 px-4 py-3 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-accent/60;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-400;
+  }
+  .gradient-text {
+    @apply bg-gradient-to-r from-white via-accent-glow to-sky-300 bg-clip-text text-transparent;
+  }
+  .prose-doc h3 {
+    @apply mt-8 mb-2 text-lg font-semibold text-white;
+  }
+  .prose-doc p {
+    @apply text-slate-300 leading-relaxed;
+  }
+  .code {
+    @apply rounded-lg bg-ink-900 border border-white/10 px-1.5 py-0.5 font-mono text-[0.8rem] text-accent-glow;
+  }
+}
+
+.codeblock {
+  @apply overflow-x-auto rounded-xl border border-white/10 bg-ink-950/80 p-4 font-mono text-[0.8rem] leading-relaxed text-slate-300;
+}
