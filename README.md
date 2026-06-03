@@ -19,10 +19,10 @@ A two-sided platform for distributing and running Large Language Models **native
 LLM integration into native macOS apps is fragmented, ignores the Apple Metal GPU, and lacks a trusted marketplace. This project delivers:
 
 - **Marketplace** — Model Developers publish GGUF models; App Developers discover, license, and download them.
-- **MCP Server** *(native macOS client — out of scope here)* — loads licensed models and runs Metal-accelerated inference, verifying licenses against this backend.
-- **Cloud fallback** — when local Metal is unavailable, inference is routed to a **Modal GPU**.
+- **Native Swift SDK** — a macOS app picks `.managedCloud` (→ Modal GPU) or `.localInfer` (→ download + run locally via **Ollama**) behind one API.
+- **Cloud inference** — runs on a **Modal GPU**; the website's Playground uses this path.
 
-This repository contains the **backend (FastAPI)**, the **web frontend (Next.js)**, and the **Modal GPU inference app** — all deployed and tested end-to-end.
+This repository contains the **backend (FastAPI)**, the **web frontend (Next.js)**, the **Modal GPU inference app**, and the **native Swift SDK** — all deployed/tested end-to-end. See **[docs/WHATS_NEW.md](docs/WHATS_NEW.md)** for the latest capabilities.
 
 ---
 
@@ -47,6 +47,7 @@ This repository contains the **backend (FastAPI)**, the **web frontend (Next.js)
 - 🎫 **Licensing** — free entitlements with **device binding** + a license-verification endpoint for the MCP server
 - ⬇️ **Secure downloads** — short-lived presigned URLs, license-gated, sha256-verified
 - ⚡ **Cloud inference** — Modal A10G GPU fallback (+ SSE streaming)
+- 🍎 **Native Swift SDK** — `.managedCloud` (Modal GPU) **and** `.localInfer` (on-device via Ollama: downloads + runs the model locally)
 - 📊 **Telemetry** — usage events and publisher reports
 
 ---
@@ -60,6 +61,7 @@ This repository contains the **backend (FastAPI)**, the **web frontend (Next.js)
 | Object storage | Cloudflare R2 (S3-compatible) — *local fallback active* |
 | Cloud GPU | Modal (A10G, llama-cpp-python) |
 | Frontend | Next.js 14 (App Router, TypeScript, Tailwind) |
+| Native SDK | Swift (SwiftPM) — Modal cloud + local Ollama |
 | Hosting | Modal (backend, frontend, GPU app) |
 
 ---
@@ -72,6 +74,8 @@ backend/          FastAPI app (models, routers, services), Modal deploy, tests
   scripts/        seed, smoke_test, full_api_test, deep_test
   tests/          pytest suite
 frontend/         Next.js app (app/ pages, components/, lib/), Modal deploy
+swift-sdk/        Native Swift SDK (MetalLLM): managed-cloud + local Ollama, CLI demo
+docs/             WHATS_NEW.md, ARCHITECTURE_COMMUNICATION.md
 .claude/specs/    Backend specification
 .claude/plan/     Implementation plan
 PROJECT_END_TO_END.md   Full end-to-end project report
@@ -98,6 +102,20 @@ cd frontend
 npm install
 NEXT_PUBLIC_API_URL=http://localhost:8000 npm run dev   # http://localhost:3000
 ```
+
+### Swift SDK
+```bash
+cd swift-sdk
+swift build
+swift run metal-llm-cli "Q: capital of Japan?\nA:"      # cloud + local Ollama demo
+```
+```swift
+let client = MetalLLM()
+try await client.login(username: "admin@metal.dev", password: "admin12345")
+let cloud = client.model(id: modelId, mode: .managedCloud)          // Modal GPU
+let local = client.localModel(ollamaModel: "qwen2.5:0.5b")          // on-device via Ollama
+```
+Local mode requires Ollama (`brew install --cask ollama` → `ollama serve`).
 
 ---
 
@@ -132,9 +150,9 @@ Configuration lives in the Modal secret `metal-backend-config` (Mongo URI, JWT s
 
 ## Status
 
-✅ **Built & deployed:** backend, frontend, cloud GPU inference, all tests passing.
+✅ **Built & deployed:** backend, frontend, cloud GPU inference, **native Swift SDK** (cloud + local Ollama), all tests passing.
 ⏳ **Optional/pending:** Cloudflare R2 storage (local fallback active), per-API Modal services (plan-limited).
-❌ **Out of scope (native client):** macOS MCP Server + Swift SDK, payments (intentionally removed).
+❌ **Out of scope:** the full macOS MCP daemon (Metal-via-Ollama covers local inference for the SDK today), payments (intentionally removed).
 
 See **[PROJECT_END_TO_END.md](PROJECT_END_TO_END.md)** for the complete report.
 
