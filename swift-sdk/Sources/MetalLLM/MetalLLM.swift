@@ -15,7 +15,7 @@ import FoundationNetworking
 /// ```
 public final class MetalLLM {
     /// Default base URL = the deployed FastAPI backend on Modal.
-    public static let defaultBaseURL = URL(string: "https://hashaamdogar--metal-marketplace-api-api.modal.run")!
+    public static let defaultBaseURL = URL(string: "https://symia-cloud--metal-marketplace-api-api.modal.run")!
 
     public let baseURL: URL
     /// Stable per-machine identifier sent with inference (for telemetry/binding).

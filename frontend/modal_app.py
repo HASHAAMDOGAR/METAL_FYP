@@ -13,7 +13,7 @@ import subprocess
 import modal
 
 # Backend (umbrella) API URL — inlined into the client bundle at build time.
-API_URL = "https://hashaamdogar--metal-marketplace-api-api.modal.run"
+API_URL = "https://symia-cloud--metal-marketplace-api-api.modal.run"
 
 image = (
     modal.Image.from_registry("node:20-slim", add_python="3.11")

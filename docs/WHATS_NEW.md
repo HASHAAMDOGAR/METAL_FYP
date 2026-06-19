@@ -2,6 +2,59 @@
 
 A running summary of capabilities added on top of the original backend + web app.
 
+> **Live (Modal `symia-cloud` workspace):**
+> Web app — https://symia-cloud--metal-marketplace-web-web.modal.run ·
+> Cloud Models — https://symia-cloud--metal-marketplace-web-web.modal.run/cloud ·
+> API — https://symia-cloud--metal-marketplace-api-api.modal.run
+
+---
+
+## ☁️ Cloud Models — hosted catalog + in-browser chat (`/cloud`)
+
+A new **Cloud Models** page lets users browse **hundreds of hosted models** on our managed GPU
+cloud and chat with any of them instantly — no download, no setup.
+
+- **Catalog** — every hosted model, searchable, with org · type · context length. Backend route
+  `GET /v1/cloud-models`.
+- **Chat** — multi-turn chat against any ready model. Backend route `POST /v1/cloud-models/chat`
+  (requires a signed-in user).
+- **"Ready to run" is verified, not guessed.** The upstream catalog has no reliable serverless
+  flag (per-token pricing over-predicts — most priced models still reject as "non-serverless").
+  So `scripts/refresh_serverless.py` **probes every text model** with a tiny call and records the
+  truly-runnable IDs in `app/serverless_models.py`. The badge reflects that allowlist.
+- **Reasoning models handled** — models that emit chain-of-thought (GPT-OSS, GLM, Qwen3-thinking)
+  return their answer in `content` and thinking in `reasoning`; the backend surfaces something
+  useful instead of a blank reply, and the UI defaults to a generous token budget.
+- **White-labeled** — the upstream provider (an OpenAI-compatible service, configured via the
+  `metal-backend-config` secret) is **never exposed** to users: model names, organizations, ids,
+  and error messages are all sanitized so only our brand is shown.
+
+| Mode | What happens | Path |
+|---|---|---|
+| Cloud Models chat | `POST /v1/cloud-models/chat` → managed cloud provider | `cloud_managed` |
+
+---
+
+## ♾️ No token limit
+
+Inference no longer caps `max_tokens`. The API schema dropped its `le=4096` ceiling, the Modal GPU
+function raises the context window and treats `max_tokens <= 0` as "unlimited" (generate until EOS
+or the context fills), and the web UI exposes a free token input / presets (incl. ∞). Use as many
+tokens as you want.
+
+---
+
+## 🎨 Redesigned web UI
+
+The whole site was rebuilt for a premium, cohesive look:
+
+- Inter typeface sitewide, layered gradient + dotted-grid background, glass-morphism cards with
+  hover lift + glow, gradient buttons.
+- New glassy **navbar** (animated active pill, mobile menu) and refreshed footer.
+- **Homepage** hero refresh + closing CTA; **marketplace** cards get colorful gradient avatars.
+- **Cloud Models** ships a full chat experience: gradient message bubbles, model avatars, typing
+  indicator, suggestion chips, token presets, and live "ready" pulse indicators.
+
 ---
 
 ## 🍎 Native Swift SDK (`swift-sdk/`)
@@ -66,7 +119,7 @@ genuine Apple-GPU-accelerated local inference. It implements the Ollama REST API
 - **Website now:** open `/how-it-works` (documents the SDK + both modes) and `/playground` (live cloud inference).
 - **Local inference is a native capability** — use the Swift SDK in a Mac app, or run the web app locally to reach a local Ollama.
 
-Live web app: https://hashaamdogar--metal-marketplace-web-web.modal.run/how-it-works
+Live web app: https://symia-cloud--metal-marketplace-web-web.modal.run/how-it-works
 
 ---
 

@@ -139,6 +139,30 @@ backend/tests/       # pytest suite
 - **Bridge:** `services/inference_service.py` resolves the function with `modal.Function.from_name(...)` and calls `await fn.remote.aio(...)`.
 - **Routing:** `POST /v1/inference` requires an active license + a `reason ∈ {no_metal_device, oom, daemon_down}` + `cloud_inference.enabled`; logs a `usage_event` with `path=cloud_modal`.
 - **Verified live:** cold start ~13–77s (first call downloads the model), warm ~3–4s.
+- **No token limit:** the `/v1/inference` schema dropped its `le=4096` cap; the GPU function raises the context window and treats `max_tokens <= 0` as "unlimited" (until EOS / context full).
+
+---
+
+## 5b. Cloud Models (managed provider) — what was built
+
+A **Cloud Models** capability that exposes hundreds of hosted models for instant in-browser chat,
+on top of a managed, OpenAI-compatible upstream provider — **white-labeled** so users only ever see
+our brand.
+
+- **`backend/app/services/cloud_models_service.py`** — proxies the provider's catalog + chat. It
+  **sanitizes** all surfaced text (model names, organizations, ids, errors) so the upstream provider
+  is never revealed, and maps the reasoning-model response shape (`reasoning` + `content`) to a
+  clean reply.
+- **`backend/app/routers/cloud_models.py`** — `GET /v1/cloud-models` (public catalog),
+  `POST /v1/cloud-models/chat` (auth-gated chat, `path=cloud_managed`).
+- **`backend/app/serverless_models.py`** — the verified "ready to run" allowlist. The provider
+  catalog has **no reliable serverless flag** (per-token pricing over-predicts — most priced models
+  still reject as "non-serverless"), so **`scripts/refresh_serverless.py`** probes every text model
+  with a 1-token call and records the truly-runnable IDs. Re-run + redeploy to refresh.
+- **Provider key** lives only in the `metal-backend-config` secret / gitignored `.env` (never
+  committed). Config keys: `together_api_key`, `together_base_url`.
+- **Verified live:** 265 models listed, 25 verified ready, 0 provider-name leaks; real multi-turn
+  chat confirmed (e.g. Llama-3.3-70B, GLM-5.2, GPT-OSS-20B).
 
 ---
 
@@ -152,6 +176,7 @@ Location: `frontend/`. Next.js 14 (App Router), TypeScript, Tailwind, dark "Appl
 | `/how-it-works` | **Service docs** — every API group (purpose, endpoints, how-to), lifecycle, cURL quickstart |
 | `/marketplace` | Browse/search catalog with filters + sorting (live API) |
 | `/marketplace/[slug]` | Model detail: specs, benchmarks, reviews, **acquire license**, link to playground |
+| `/cloud` | **Cloud Models** — browse hundreds of hosted models + a full in-browser chat UI |
 | `/playground` | **Live inference** via the Modal GPU fallback (auto-acquires license) |
 | `/login`, `/register` | JWT auth (consumer or publisher) |
 | `/dashboard` | Licenses, **device bind/unbind**, **downloads** |
@@ -165,15 +190,18 @@ Location: `frontend/`. Next.js 14 (App Router), TypeScript, Tailwind, dark "Appl
 
 | Thing | URL / ID | Status |
 |---|---|---|
-| **Frontend** | https://hashaamdogar--metal-marketplace-web-web.modal.run | ✅ live |
-| **Backend API** | https://hashaamdogar--metal-marketplace-api-api.modal.run | ✅ live |
+| **Frontend** | https://symia-cloud--metal-marketplace-web-web.modal.run | ✅ live |
+| **Cloud Models** | …-web-web.modal.run/cloud | ✅ live |
+| **Backend API** | https://symia-cloud--metal-marketplace-api-api.modal.run | ✅ live |
 | API docs | …-api.modal.run/docs | ✅ |
 | **Modal GPU inference** | app `metal-llm-fallback` / `generate` | ✅ live |
+| **Cloud Models provider** | managed OpenAI-compatible upstream (white-labeled) | ✅ live |
 | **MongoDB** | Atlas `cluster0.ghr08hl`, db `metal_marketplace` | ✅ live + seeded |
 | Demo admin | `admin@metal.dev` / `admin12345` | ✅ |
 
+**Modal workspace:** `symia-cloud`.
 **Modal apps deployed:** `metal-marketplace-web`, `metal-marketplace-api`, `metal-llm-fallback`.
-**Config:** Modal secret `metal-backend-config` (Atlas URI, JWT secret, storage, etc.).
+**Config:** Modal secret `metal-backend-config` (Atlas URI, JWT secret, storage, Cloud Models provider key, etc.).
 
 > Note: backend is currently deployed as a **single "umbrella" web service** (serves all APIs) to fit Modal's **8-web-function plan limit**. Per-API services exist in code (`DEPLOY_PER_API=1`) and need a plan upgrade to deploy individually.
 
@@ -297,7 +325,8 @@ cd backend && source .venv/bin/activate && python -m scripts.deep_test
 `STORAGE_BACKEND` (`local`|`r2`), `LOCAL_STORAGE_DIR`, `PUBLIC_BASE_URL`,
 `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_ACCOUNT_ID`,
 `MODAL_APP_NAME`, `MAX_DEVICES_DEFAULT`, `RATE_LIMIT_PER_MINUTE`,
-`DOWNLOAD_URL_TTL`, `UPLOAD_URL_TTL`.
+`DOWNLOAD_URL_TTL`, `UPLOAD_URL_TTL`,
+`TOGETHER_API_KEY`, `TOGETHER_BASE_URL` (Cloud Models provider — secret-only, never committed).
 Frontend (build-time): `NEXT_PUBLIC_API_URL`.
 
 ---
