@@ -39,6 +39,11 @@ class Settings(BaseSettings):
     modal_token_secret: str = ""
     modal_app_name: str = "metal-llm-fallback"
 
+    # Managed cloud-model provider (upstream, white-labeled — never exposed to clients).
+    # Powers the "Cloud Models" catalog + chat. OpenAI-compatible endpoint.
+    together_api_key: str = ""
+    together_base_url: str = "https://api.together.xyz/v1"
+
     # Misc
     download_url_ttl: int = 300
     upload_url_ttl: int = 900

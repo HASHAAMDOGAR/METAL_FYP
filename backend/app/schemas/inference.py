@@ -9,7 +9,9 @@ from app.models.enums import InferenceReason
 class InferenceRequest(BaseModel):
     model_id: str
     prompt: str = Field(min_length=1)
-    max_tokens: int = Field(default=512, ge=1, le=4096)
+    # No upper limit: use as many tokens as you want. -1 (or 0) = unlimited —
+    # generate until the model emits EOS or fills its context window.
+    max_tokens: int = Field(default=512, ge=-1)
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
     device_id: str | None = None
     reason: InferenceReason

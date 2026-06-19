@@ -15,6 +15,7 @@ from app.routers import (
     admin,
     auth,
     catalog,
+    cloud_models,
     downloads,
     inference,
     licenses,
@@ -39,6 +40,7 @@ ROUTERS = {
     "downloads": downloads.router,
     "inference": inference.router,
     "telemetry": telemetry.router,
+    "cloud_models": cloud_models.router,
 }
 
 

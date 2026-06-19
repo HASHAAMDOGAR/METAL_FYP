@@ -59,10 +59,14 @@ def generate(
     path = hf_hub_download(repo_id=repo, filename=filename, cache_dir=CACHE_DIR)
     _cache.commit()
 
-    llm = Llama(model_path=path, n_gpu_layers=-1, n_ctx=4096, verbose=False)
+    # Large context so users aren't limited to a small completion length.
+    llm = Llama(model_path=path, n_gpu_layers=-1, n_ctx=8192, verbose=False)
+
+    # max_tokens <= 0 means "no limit" — generate until EOS or context is full.
+    mt = max_tokens if max_tokens and max_tokens > 0 else -1
 
     start = time.time()
-    out = llm.create_completion(prompt, max_tokens=max_tokens, temperature=temperature)
+    out = llm.create_completion(prompt, max_tokens=mt, temperature=temperature)
     elapsed = max(time.time() - start, 1e-6)
 
     text = out["choices"][0]["text"]
