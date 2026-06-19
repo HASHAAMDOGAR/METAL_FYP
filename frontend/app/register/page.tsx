@@ -31,8 +31,10 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="container-x flex justify-center py-20">
+    <div className="container-x relative flex justify-center py-20">
+      <div className="pointer-events-none absolute top-10 left-1/2 -z-10 h-72 w-96 -translate-x-1/2 rounded-full bg-accent/20 blur-[100px]" />
       <Card className="w-full max-w-md p-8">
+        <div className="mb-6 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-accent to-sky-400 text-lg font-black text-white shadow-lg shadow-accent/30">M</div>
         <h1 className="text-2xl font-bold text-white">Create your account</h1>
         <p className="mt-1 text-sm text-slate-400">Free — no payment required.</p>
         <form onSubmit={submit} className="mt-6 space-y-4">

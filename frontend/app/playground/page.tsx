@@ -73,8 +73,15 @@ function Playground() {
           <label className="label mt-4">Prompt</label>
           <textarea className="input min-h-[120px]" value={prompt} onChange={(e) => setPrompt(e.target.value)} />
 
-          <label className="label mt-4">Max tokens: {maxTokens}</label>
-          <input type="range" min={16} max={256} value={maxTokens} onChange={(e) => setMaxTokens(+e.target.value)} className="w-full accent-[#7c6cff]" />
+          <label className="label mt-4">Max tokens {maxTokens === 0 ? "(unlimited)" : ""}</label>
+          <input
+            type="number"
+            min={0}
+            value={maxTokens}
+            onChange={(e) => setMaxTokens(Math.max(0, parseInt(e.target.value || "0", 10)))}
+            className="input"
+          />
+          <p className="mt-1 text-xs text-slate-400">No limit — set any value. 0 = unlimited (until the model stops or fills its context).</p>
 
           <button onClick={run} disabled={busy || !modelId} className="btn-primary mt-5 w-full">
             {busy ? "Generating on Modal GPU…" : "Run inference"}
@@ -107,10 +114,11 @@ function Playground() {
 
 export default function Page() {
   return (
-    <div className="container-x py-14">
+    <div className="container-x relative py-14">
+      <div className="pointer-events-none absolute -top-10 right-0 -z-10 h-72 w-96 rounded-full bg-accent/15 blur-[110px]" />
       <Badge tone="accent">Cloud GPU · Modal fallback</Badge>
-      <h1 className="mt-4 text-4xl font-bold text-white">Inference Playground</h1>
-      <p className="mt-2 max-w-2xl text-slate-300">
+      <h1 className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">Inference Playground</h1>
+      <p className="mt-3 max-w-2xl text-slate-300">
         This runs the same path your app uses when local Apple Metal is unavailable: the request is license-checked and
         routed to a Modal GPU. The first call may cold-start the model (~30–60s); later calls are fast.
       </p>

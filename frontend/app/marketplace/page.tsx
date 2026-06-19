@@ -12,6 +12,20 @@ const SORTS = [
   ["rating", "Top rated"],
 ];
 
+function hue(s: string) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
+  return h;
+}
+function avatarStyle(s: string): React.CSSProperties {
+  const h = hue(s);
+  return { backgroundImage: `linear-gradient(135deg, hsl(${h} 75% 58%), hsl(${(h + 55) % 360} 70% 46%))` };
+}
+function initials(name: string) {
+  const p = name.replace(/[^a-zA-Z0-9 ]/g, " ").trim().split(/\s+/);
+  return ((p[0]?.[0] || "") + (p[1]?.[0] || "")).toUpperCase() || "M";
+}
+
 export default function Marketplace() {
   const [items, setItems] = useState<ModelListItem[]>([]);
   const [total, setTotal] = useState(0);
@@ -45,10 +59,14 @@ export default function Marketplace() {
 
   return (
     <div className="container-x py-14">
+      <div className="pointer-events-none absolute left-1/2 top-20 -z-10 h-72 w-[40rem] -translate-x-1/2 rounded-full bg-accent/10 blur-[120px]" />
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-bold text-white">Model Marketplace</h1>
-          <p className="mt-2 text-slate-400">{total} approved model{total === 1 ? "" : "s"} ready to license & run.</p>
+          <span className="mb-3 inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-accent-glow">
+            Discover
+          </span>
+          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">Model Marketplace</h1>
+          <p className="mt-3 text-slate-400">{total} approved model{total === 1 ? "" : "s"} ready to license &amp; run on Apple Silicon.</p>
         </div>
         <form
           onSubmit={(e) => {
@@ -90,17 +108,26 @@ export default function Marketplace() {
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((m) => (
             <Link key={m.id} href={`/marketplace/${m.slug}`}>
-              <Card hover className="h-full p-5">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold text-white">{m.name}</h3>
+              <Card hover className="group flex h-full flex-col p-5">
+                <div className="flex items-start gap-3">
+                  <span
+                    style={avatarStyle(m.name)}
+                    className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold text-white shadow-lg"
+                  >
+                    {initials(m.name)}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="truncate font-semibold text-white group-hover:text-accent-glow">{m.name}</h3>
+                    <p className="mt-0.5 text-xs capitalize text-slate-500">{m.architecture}</p>
+                  </div>
                   <Badge tone="green">free</Badge>
                 </div>
-                <div className="mt-3 flex flex-wrap gap-1.5">
+                <div className="mt-4 flex flex-wrap gap-1.5">
                   <Badge tone="accent">{m.architecture}</Badge>
                   {m.quantization && <Badge>{m.quantization}</Badge>}
                   {m.param_count_b && <Badge>{m.param_count_b}B</Badge>}
                 </div>
-                <div className="mt-4 flex items-center justify-between text-xs text-slate-400">
+                <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-3 text-xs text-slate-400">
                   <span>⭐ {m.metrics.rating_avg.toFixed(1)} ({m.metrics.rating_count})</span>
                   <span>⬇ {m.metrics.downloads}</span>
                   {m.metrics.tokens_per_sec_m2 && <span>{m.metrics.tokens_per_sec_m2} tok/s</span>}

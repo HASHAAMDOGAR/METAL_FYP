@@ -9,35 +9,55 @@
 body {
   @apply bg-ink-950 text-slate-200 antialiased;
   background-image:
-    radial-gradient(60rem 60rem at 80% -10%, rgba(124, 108, 255, 0.18), transparent 60%),
-    radial-gradient(50rem 50rem at -10% 10%, rgba(56, 189, 248, 0.12), transparent 55%);
+    radial-gradient(55rem 55rem at 85% -15%, rgba(124, 108, 255, 0.20), transparent 60%),
+    radial-gradient(45rem 45rem at -10% 5%, rgba(56, 189, 248, 0.14), transparent 55%),
+    radial-gradient(40rem 40rem at 50% 120%, rgba(124, 108, 255, 0.10), transparent 60%);
   background-attachment: fixed;
 }
+
+/* Subtle dotted grid texture over the whole page */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 100% 60% at 50% 0%, black, transparent 75%);
+}
+
+::selection {
+  background: rgba(124, 108, 255, 0.35);
+  color: #fff;
+}
+
+h1, h2, h3 { letter-spacing: -0.02em; }
 
 @layer components {
   .container-x {
     @apply mx-auto w-full max-w-6xl px-5;
   }
   .card {
-    @apply rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm;
+    @apply rounded-2xl border border-white/10 bg-white/[0.035] shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_20px_40px_-24px_rgba(0,0,0,0.7)] backdrop-blur-md;
   }
   .card-hover {
-    @apply transition hover:border-accent/40 hover:bg-white/[0.06];
+    @apply transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:bg-white/[0.06] hover:shadow-[0_1px_0_0_rgba(255,255,255,0.06)_inset,0_24px_50px_-20px_rgba(124,108,255,0.35)];
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-primary {
-    @apply btn bg-accent text-white shadow-lg shadow-accent/25 hover:bg-accent-glow;
+    @apply btn bg-gradient-to-br from-accent to-[#6a5cff] text-white shadow-lg shadow-accent/30 hover:shadow-xl hover:shadow-accent/40 hover:brightness-110 active:scale-[0.98];
   }
   .btn-ghost {
-    @apply btn border border-white/15 text-slate-200 hover:bg-white/5;
+    @apply btn border border-white/15 bg-white/[0.02] text-slate-200 hover:border-white/25 hover:bg-white/5 active:scale-[0.98];
   }
   .badge {
     @apply inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-xs font-medium text-slate-300;
   }
   .input {
-    @apply w-full rounded-xl border border-white/10 bg-ink-900/60 px-4 py-3 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-accent/60;
+    @apply w-full rounded-xl border border-white/10 bg-ink-900/60 px-4 py-3 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-accent/60 focus:ring-2 focus:ring-accent/20;
   }
   .label {
     @apply mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-400;
@@ -59,3 +79,36 @@ body {
 .codeblock {
   @apply overflow-x-auto rounded-xl border border-white/10 bg-ink-950/80 p-4 font-mono text-[0.8rem] leading-relaxed text-slate-300;
 }
+
+/* ---- Cloud Models page polish ---- */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.animate-fade-up { animation: fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+.animate-pop { animation: pop-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@keyframes blink {
+  0%, 80%, 100% { opacity: 0.2; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-2px); }
+}
+.typing-dot { animation: blink 1.4s infinite both; }
+
+@keyframes ready-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55); }
+  70% { box-shadow: 0 0 0 5px rgba(52, 211, 153, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+}
+.ready-dot { animation: ready-pulse 2.2s infinite; }
+
+/* Thin scrollbars for catalog + chat panes */
+.scroll-thin { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.14) transparent; }
+.scroll-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+.scroll-thin::-webkit-scrollbar-thumb { @apply rounded-full bg-white/10; }
+.scroll-thin::-webkit-scrollbar-thumb:hover { @apply bg-white/20; }
+.scroll-thin::-webkit-scrollbar-track { background: transparent; }

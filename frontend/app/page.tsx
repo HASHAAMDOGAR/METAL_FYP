@@ -33,19 +33,27 @@ export default function Home() {
     <>
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="container-x grid gap-10 py-20 lg:grid-cols-2 lg:py-28">
+        <div className="pointer-events-none absolute -top-40 right-0 h-[30rem] w-[30rem] rounded-full bg-accent/25 blur-[120px]" />
+        <div className="pointer-events-none absolute top-10 -left-20 h-[24rem] w-[24rem] rounded-full bg-sky-500/15 blur-[120px]" />
+        <div className="container-x grid items-center gap-10 py-20 lg:grid-cols-2 lg:py-28">
           <div>
-            <Badge tone="accent">UCP Final Year Project · F25CS008</Badge>
-            <h1 className="mt-5 text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
-              Apple Metal-powered <span className="gradient-text">LLM Marketplace</span> with MCP server support
+            <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent-glow">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+              </span>
+              UCP Final Year Project · F25CS008
+            </div>
+            <h1 className="mt-6 text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Run <span className="gradient-text">LLMs natively</span> on Apple Silicon
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-slate-300">
-              Discover, license, and run large language models natively on Apple Silicon — accelerated by the Metal GPU,
-              with a seamless Modal cloud fallback when local Metal isn&apos;t available.
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-300">
+              Discover, license, and run large language models accelerated by the Apple Metal GPU —
+              with a seamless managed cloud fallback when local Metal isn&apos;t available.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/marketplace" className="btn-primary">Browse the marketplace</Link>
-              <Link href="/how-it-works" className="btn-ghost">How it works</Link>
+              <Link href="/cloud" className="btn-primary">Try Cloud Models →</Link>
+              <Link href="/marketplace" className="btn-ghost">Browse the marketplace</Link>
             </div>
             <div className="mt-10 grid max-w-md grid-cols-3 gap-3">
               <Stat value="30+" label="tokens/sec on M2 (7B)" />
@@ -102,8 +110,10 @@ export default function Home() {
       <Section kicker="Three core innovations" title="What makes it different">
         <div className="grid gap-6 md:grid-cols-3">
           {innovations.map((i) => (
-            <Card key={i.title} hover className="p-6">
-              <div className="text-3xl">{i.icon}</div>
+            <Card key={i.title} hover className="group p-6">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-accent/30 to-sky-500/20 text-2xl ring-1 ring-white/10 transition group-hover:from-accent/40 group-hover:to-sky-500/30">
+                {i.icon}
+              </div>
               <h3 className="mt-4 text-lg font-semibold text-white">{i.title}</h3>
               <p className="mt-2 text-slate-300">{i.body}</p>
             </Card>
@@ -121,11 +131,26 @@ export default function Home() {
             </Card>
           ))}
         </div>
-        <div className="mt-10 flex flex-wrap gap-3">
-          <Link href="/register" className="btn-primary">Create an account</Link>
-          <Link href="/how-it-works" className="btn-ghost">Read the service docs</Link>
-        </div>
       </Section>
+
+      {/* Closing CTA */}
+      <section className="pb-24">
+        <div className="container-x">
+          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-accent/15 via-white/[0.03] to-sky-500/10 p-10 text-center sm:p-14">
+            <div className="pointer-events-none absolute -top-20 left-1/2 h-56 w-[34rem] -translate-x-1/2 rounded-full bg-accent/25 blur-[100px]" />
+            <h2 className="relative text-3xl font-bold text-white sm:text-4xl">
+              Start running models in seconds
+            </h2>
+            <p className="relative mx-auto mt-4 max-w-xl text-slate-300">
+              Create a free account, then chat with hundreds of hosted models or license one to run on-device.
+            </p>
+            <div className="relative mt-8 flex flex-wrap justify-center gap-3">
+              <Link href="/register" className="btn-primary">Create a free account</Link>
+              <Link href="/cloud" className="btn-ghost">Explore Cloud Models</Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

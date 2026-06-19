@@ -1,7 +1,7 @@
 // Typed client for the Metal Marketplace backend (FastAPI on Modal).
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  "https://hashaamdogar--metal-marketplace-api-api.modal.run";
+  "https://symia-cloud--metal-marketplace-api-api.modal.run";
 
 export type Tokens = { access_token: string; refresh_token: string; token_type: string };
 
@@ -27,6 +27,15 @@ export interface ModelDetail extends ModelListItem {
   use_cases: string[];
   artifact: { storage_key?: string | null; size_bytes?: number | null; sha256?: string | null; version?: string };
   cloud_inference: { enabled: boolean; modal_app: string; modal_function: string; served_model_ref?: string | null };
+}
+
+export interface CloudModel {
+  id: string;
+  name: string;
+  organization?: string | null;
+  type?: string | null;
+  context_length?: number | null;
+  chattable: boolean;
 }
 
 export interface Page<T> { items: T[]; total: number; page: number; page_size: number }
@@ -140,6 +149,17 @@ export const api = {
   inference(body: { model_id: string; prompt: string; max_tokens?: number; temperature?: number; device_id?: string; reason: string }) {
     return request<{ output: string; tokens_generated: number; tokens_per_sec: number; path: string }>(
       "/v1/inference",
+      { method: "POST", body: JSON.stringify(body), auth: true },
+    );
+  },
+
+  // cloud models (managed GPU cloud)
+  listCloudModels() {
+    return request<CloudModel[]>("/v1/cloud-models");
+  },
+  cloudChat(body: { model: string; messages: { role: string; content: string }[]; max_tokens?: number; temperature?: number }) {
+    return request<{ output: string; model: string; tokens_generated: number; prompt_tokens: number; path: string }>(
+      "/v1/cloud-models/chat",
       { method: "POST", body: JSON.stringify(body), auth: true },
     );
   },

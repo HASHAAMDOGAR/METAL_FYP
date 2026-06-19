@@ -16,10 +16,14 @@ export function Badge({ children, tone = "default" }: { children: ReactNode; ton
 
 export function Section({ title, kicker, children }: { title: string; kicker?: string; children: ReactNode }) {
   return (
-    <section className="py-14">
+    <section className="py-16">
       <div className="container-x">
-        {kicker && <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-accent-glow">{kicker}</p>}
-        <h2 className="mb-8 text-3xl font-bold text-white sm:text-4xl">{title}</h2>
+        {kicker && (
+          <span className="mb-3 inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-accent-glow">
+            {kicker}
+          </span>
+        )}
+        <h2 className="mb-9 text-3xl font-bold text-white sm:text-4xl">{title}</h2>
         {children}
       </div>
     </section>
@@ -28,7 +32,7 @@ export function Section({ title, kicker, children }: { title: string; kicker?: s
 
 export function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div className="card p-5">
+    <div className="card card-hover p-5">
       <div className="text-2xl font-bold gradient-text">{value}</div>
       <div className="mt-1 text-xs text-slate-400">{label}</div>
     </div>
